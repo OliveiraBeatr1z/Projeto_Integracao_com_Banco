@@ -2,12 +2,9 @@ package br.com.bank.domain.conta;
 
 import br.com.bank.ConnectionFactory;
 import br.com.bank.domain.RegraDeNegocioException;
-import br.com.bank.domain.cliente.Cliente;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +19,8 @@ public class ContaService{
     private Set<Conta> contas = new HashSet<>();
 
     public Set<Conta> listarContasAbertas(){
-        return contas;
+        Connection conn = connection.conectarDB();
+        return new ContaDAO(conn).listar();
     }
 
     public BigDecimal consultarSaldo (Integer numeroDaConta){
@@ -31,30 +29,10 @@ public class ContaService{
     }
 
     public void abrir (DadosAberturaConta dadosDaConta){
-        var cliente = new Cliente(dadosDaConta.dadosCliente());
-        var conta = new Conta(dadosDaConta.numero(), cliente);
-        if (contas.contains(conta)){
-            throw new RegraDeNegocioException("Já existe uma conta aberta com o mesmo número!");
-        }
-
-        String sql = "INSERT INTO conta (numero, saldo, cliente_nome, cliente_cpf, cliente_email)" +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        Connection con = connection.conectarDB();
-        try {
-            PreparedStatement preparedStatement = con.prepareStatement(sql);
-
-            preparedStatement.setInt(1, conta.getNumero());
-            preparedStatement.setBigDecimal(2, BigDecimal.ZERO);
-            preparedStatement.setString(3, dadosDaConta.dadosCliente().nome());
-            preparedStatement.setString(4, dadosDaConta.dadosCliente().cpf());
-            preparedStatement.setString(5, dadosDaConta.dadosCliente().email());
-
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        Connection conn = connection.conectarDB();
+        new ContaDAO(conn).salvar(dadosDaConta);
     }
+
     public void realizarSaque(Integer numeroDaConta, BigDecimal valor){
         var conta = buscarContaPorNumero(numeroDaConta);
         if(valor.compareTo(BigDecimal.ZERO) <= 0) {
@@ -84,13 +62,17 @@ public class ContaService{
         }
         contas.remove(conta);
     }
-
     public Conta buscarContaPorNumero (Integer numeroDaConta){
         return contas
                 .stream()
                 .filter(c -> c.getNumero().equals(numeroDaConta))
                 .findFirst()
                 .orElseThrow(() -> new RegraDeNegocioException("Não existe conta cadastrada com esse número!"));
+    }
+
+    public Conta listagemPorNumero(Integer numeroDaConta){
+        Connection conn = connection.conectarDB();
+        return new ContaDAO(conn).listagemPorNumero(numeroDaConta);
     }
 }
 
