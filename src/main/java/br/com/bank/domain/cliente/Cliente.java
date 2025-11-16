@@ -1,8 +1,8 @@
-package br.com.bank.domain.cliente.Cliente;
+package br.com.bank.domain.cliente;
 
 import java.util.Objects;
 
-public class Client{
+public class Cliente {
     private String name;
     private String cpf;
     private String email;
@@ -13,15 +13,15 @@ public class Client{
         this.email = dados.email();
     }
 
-    @override
+    @Override
     public boolean equals(Object o){
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cliente cliente = (Cliente) o;
-        return cpf.equals(cliente.cpf);
+        return Objects.equals(cpf, cliente.cpf);
     }
 
-    @override
+    @Override
     public int hashCode(){
         return Objects.hash(cpf);
     }
@@ -29,19 +29,18 @@ public class Client{
     public String getName(){
         return name;
     }
+
     public String getCpf(){
         return cpf;
-}
+    }
+
     public String getEmail(){
         return email;
     }
+
+    @Override
+    public String toString(){
+        return "Cliente{name='" + name + "', cpf='" + cpf + "', email='" + email + "'}";
+    }
 }
-
-
-
-
-
-
-
-
 

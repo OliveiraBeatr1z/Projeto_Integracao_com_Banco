@@ -1,4 +1,6 @@
-import br.com.bank.domain.conta.Contra;
+package br.com.bank.domain.conta;
+
+import br.com.bank.domain.cliente.Cliente;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -14,9 +16,8 @@ public class Conta {
         this.titular = titular;
     }
 
-    public boolean possuiSaldo?(){
-
-        this.saldo = this.saldo.compareTo(BigDecimal.ZERO) !=  0;
+    public boolean possuiSaldo(){
+        return this.saldo.compareTo(BigDecimal.ZERO) > 0;
     }
 
     public void sacar(BigDecimal valor){
@@ -27,13 +28,15 @@ public class Conta {
         this.saldo = this.saldo.add(valor);
     }
 
+    @Override
     public boolean equals(Object o){
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Conta conta = (Conta) o;
-        return numero.equals(conta.numero);
+        return Objects.equals(numero, conta.numero);
     }
 
+    @Override
     public int hashCode(){
         return Objects.hash(numero);
     }
@@ -50,6 +53,7 @@ public class Conta {
         return titular;
     }
 
+    @Override
     public String toString(){
         return "Conta{" +
                 "numero=" + numero +
@@ -58,3 +62,4 @@ public class Conta {
                 '}';
     }
 }
+

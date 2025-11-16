@@ -1,4 +1,11 @@
+package br.com.bank;
+
+import br.com.bank.domain.conta.ContaService;
+import br.com.bank.domain.conta.DadosAberturaConta;
+import br.com.bank.domain.cliente.DadosCadastroCliente;
+
 import java.util.Scanner;
+import java.math.BigDecimal;
 
 public class BytebankApplication {
 
@@ -29,8 +36,8 @@ public class BytebankApplication {
                         realizarDeposito();
                         break;
                 }
-            } catch (RegraDeNegocioException e) {
-                System.out.println("Erro: " +e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
                 System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu");
                 teclado.next();
             }
@@ -98,7 +105,7 @@ public class BytebankApplication {
         System.out.println("Digite o número da conta:");
         var numeroDaConta = teclado.nextInt();
         var saldo = service.consultarSaldo(numeroDaConta);
-        System.out.println("Saldo da conta: " +saldo);
+        System.out.println("Saldo da conta: " + saldo);
 
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
         teclado.next();
@@ -131,3 +138,4 @@ public class BytebankApplication {
         teclado.next();
     }
 }
+
