@@ -3,12 +3,12 @@ package br.com.bank.domain.cliente;
 import java.util.Objects;
 
 public class Cliente {
-    private String name;
+    private String nome;
     private String cpf;
     private String email;
 
     public Cliente(DadosCadastroCliente dados){
-        this.name = dados.name();
+        this.nome = dados.nome();
         this.cpf = dados.cpf();
         this.email = dados.email();
     }
@@ -26,8 +26,8 @@ public class Cliente {
         return Objects.hash(cpf);
     }
 
-    public String getName(){
-        return name;
+    public String getNome(){
+        return nome;
     }
 
     public String getCpf(){
@@ -40,7 +40,7 @@ public class Cliente {
 
     @Override
     public String toString(){
-        return "Cliente{name='" + name + "', cpf='" + cpf + "', email='" + email + "'}";
+        return "Cliente{nome='" + nome + "', cpf='" + cpf + "', email='" + email + "'}";
     }
 }
 

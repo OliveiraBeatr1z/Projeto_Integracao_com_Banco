@@ -1,5 +1,5 @@
 package br.com.bank.domain.cliente;
 
-public record DadosCadastroCliente(String name, String cpf, String email) {
+public record DadosCadastroCliente(String nome, String cpf, String email) {
 }
 

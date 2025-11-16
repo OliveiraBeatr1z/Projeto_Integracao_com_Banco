@@ -1,14 +1,24 @@
 package br.com.bank.domain.conta;
 
+import br.com.bank.ConnectionFactory;
 import br.com.bank.domain.RegraDeNegocioException;
 import br.com.bank.domain.cliente.Cliente;
-import br.com.bank.domain.cliente.DadosCadastroCliente;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ContaService{
+
+   private ConnectionFactory connection;
+
+   public ContaService(){
+        this.connection = new ConnectionFactory();
+   }
+
     private Set<Conta> contas = new HashSet<>();
 
     public Set<Conta> listarContasAbertas(){
@@ -27,9 +37,24 @@ public class ContaService{
             throw new RegraDeNegocioException("Já existe uma conta aberta com o mesmo número!");
         }
 
-        contas.add(conta);
-    }
+        String sql = "INSERT INTO conta (numero, saldo, cliente_nome, cliente_cpf, cliente_email)" +
+                "VALUES (?, ?, ?, ?, ?)";
 
+        Connection con = connection.conectarDB();
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+
+            preparedStatement.setInt(1, conta.getNumero());
+            preparedStatement.setBigDecimal(2, BigDecimal.ZERO);
+            preparedStatement.setString(3, dadosDaConta.dadosCliente().nome());
+            preparedStatement.setString(4, dadosDaConta.dadosCliente().cpf());
+            preparedStatement.setString(5, dadosDaConta.dadosCliente().email());
+
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void realizarSaque(Integer numeroDaConta, BigDecimal valor){
         var conta = buscarContaPorNumero(numeroDaConta);
         if(valor.compareTo(BigDecimal.ZERO) <= 0) {
