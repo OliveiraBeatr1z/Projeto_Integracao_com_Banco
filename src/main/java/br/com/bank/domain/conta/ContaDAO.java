@@ -21,7 +21,7 @@ public class ContaDAO {
 
     public void salvar(DadosAberturaConta dadosDaConta){
         var cliente = new Cliente(dadosDaConta.dadosCliente());
-        var conta = new Conta(dadosDaConta.numero(), cliente);
+        var conta = new Conta(dadosDaConta.numero(), BigDecimal.ZERO,  cliente);
 
         String sql = "INSERT INTO conta (numero, saldo, cliente_nome, cliente_cpf, cliente_email)" +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -68,7 +68,7 @@ public class ContaDAO {
                 DadosCadastroCliente dados = new DadosCadastroCliente(nome, cpf, email);
                 Cliente cliente = new Cliente(dados);
 
-                contas.add(new Conta(numero, cliente));
+                contas.add(new Conta(numero, saldo, cliente));
             }
             ps.close();
             rs.close();
@@ -80,39 +80,46 @@ public class ContaDAO {
     }
 
     public Conta listagemPorNumero(Integer numeroDaConta){
-        Conta conta = null;
-        PreparedStatement ps;
-        ResultSet rs;
-        Set<Conta> contas = new HashSet<>();
 
         String sql = "SELECT * FROM conta WHERE numero = ?";
 
-        try {
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, numeroDaConta);
-            rs = ps.executeQuery();
-           
-            while(rs.next()){
-                Integer numeroRecuperado = rs.getInt(1);
-                BigDecimal saldo = rs.getBigDecimal(2);
-                String nome = rs.getString(3);
-                String cpf = rs.getString(4);
-                String email = rs.getString(5);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Integer numeroRecuperado = rs.getInt("numero");
+                    BigDecimal saldo = rs.getBigDecimal("saldo");
+                    String nome = rs.getString("cliente_nome");
+                    String cpf = rs.getString("cliente_cpf");
+                    String email = rs.getString("cliente_email");
 
-                DadosCadastroCliente dados = new DadosCadastroCliente(nome, cpf, email);
-                Cliente cliente = new Cliente(dados);
+                    DadosCadastroCliente dados = new DadosCadastroCliente(nome, cpf, email);
+                    Cliente cliente = new Cliente(dados);
 
-                conta = new Conta(numeroRecuperado, cliente);
+                    return new Conta(numeroRecuperado, saldo, cliente);
+                }
             }
-            ps.close();
-            rs.close();
-            conn.close();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return conta;
+        return null;
     }
 
+    public void alterar(Integer numero, BigDecimal valor ){
+        PreparedStatement ps;
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try{
+            ps = conn.prepareStatement(sql);
+            ps.setBigDecimal(1, valor);
+            ps.setInt(2, numero);
+            ps.execute();
+
+            ps.close();
+            conn.close();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
 
 }

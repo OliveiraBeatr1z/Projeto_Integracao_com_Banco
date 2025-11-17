@@ -52,7 +52,8 @@ public class ContaService{
         if(valor.compareTo(BigDecimal.ZERO) <= 0){
             throw new RegraDeNegocioException("O valor do depósito deve ser maior que zero!");
         }
-        conta.depositar(valor);
+        Connection conn = connection.conectarDB();
+        new ContaDAO(conn).alterar(conta.getNumero(), valor);
     }
 
     public void encerrar(Integer numeroDaConta){
@@ -62,12 +63,15 @@ public class ContaService{
         }
         contas.remove(conta);
     }
-    public Conta buscarContaPorNumero (Integer numeroDaConta){
-        return contas
-                .stream()
-                .filter(c -> c.getNumero().equals(numeroDaConta))
-                .findFirst()
-                .orElseThrow(() -> new RegraDeNegocioException("Não existe conta cadastrada com esse número!"));
+
+    private Conta buscarContaPorNumero(Integer numero) {
+        Connection conn = connection.conectarDB();
+        Conta conta = new ContaDAO(conn).listagemPorNumero(numero);
+        if(conta != null) {
+            return conta;
+        } else {
+            throw new RegraDeNegocioException("Não existe conta cadastrada com esse número!");
+        }
     }
 
     public Conta listagemPorNumero(Integer numeroDaConta){
