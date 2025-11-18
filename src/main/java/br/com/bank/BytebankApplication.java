@@ -5,7 +5,6 @@ import br.com.bank.domain.conta.DadosAberturaConta;
 import br.com.bank.domain.cliente.DadosCadastroCliente;
 
 import java.util.Scanner;
-import java.math.BigDecimal;
 
 public class BytebankApplication {
 
@@ -24,7 +23,7 @@ public class BytebankApplication {
                         abrirConta();
                         break;
                     case 3:
-                        encerrarConta();
+                        alterarLogico();
                         break;
                     case 4:
                         consultarSaldo();
@@ -36,7 +35,7 @@ public class BytebankApplication {
                         realizarDeposito();
                         break;
                     case 7:
-                        listarContaPorNumero();
+                        realizarTransferencia();
                         break;
                 }
             } catch (Exception e) {
@@ -46,7 +45,6 @@ public class BytebankApplication {
             }
             opcao = exibirMenu();
         }
-
         System.out.println("Finalizando a aplicação.");
     }
 
@@ -59,7 +57,7 @@ public class BytebankApplication {
                 4 - Consultar saldo de uma conta
                 5 - Realizar saque em uma conta
                 6 - Realizar depósito em uma conta
-                7 - Buscar numero da conta
+                7 - Realizar Transferência
                 8 - Sair
                 """);
         return teclado.nextInt();
@@ -94,11 +92,11 @@ public class BytebankApplication {
         teclado.next();
     }
 
-    private static void encerrarConta() {
+    private static void alterarLogico() {
         System.out.println("Digite o número da conta:");
         var numeroDaConta = teclado.nextInt();
 
-        service.encerrar(numeroDaConta);
+        service.encerrarLogico(numeroDaConta);
 
         System.out.println("Conta encerrada com sucesso!");
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
@@ -142,10 +140,19 @@ public class BytebankApplication {
         teclado.next();
     }
 
-    private static void listarContaPorNumero() {
-        var numeroDaConta = teclado.nextInt();
-        var conta = service.listagemPorNumero(numeroDaConta);
-        System.out.println("Conta encontrada:" + conta);
+    private static void realizarTransferencia() {
+        System.out.println("Digite o número da conta de origem");
+        var numeroDaContaOrigem = teclado.nextInt();
+
+        System.out.println("Digite o número da conta de destino");
+        var numeroDaContaDestino = teclado.nextInt();
+
+        System.out.println("Digite o valor da transferência:");
+        var valor = teclado.nextBigDecimal();
+
+        service.realizarTransferencia(numeroDaContaOrigem, numeroDaContaDestino, valor);
+
+        System.out.println("Transferência realizada com sucesso!");
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
         teclado.next();
     }
