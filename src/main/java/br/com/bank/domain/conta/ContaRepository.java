@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ContaRepository extends JpaRepository<Conta, Long> {
+public interface ContaRepository extends JpaRepository<Conta, Integer> {
     
     Optional<Conta> findByNumero(Integer numero);
     
@@ -15,4 +15,3 @@ public interface ContaRepository extends JpaRepository<Conta, Long> {
     
     boolean existsByNumero(Integer numero);
 }
-

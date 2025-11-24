@@ -2,45 +2,71 @@ package br.com.bank.domain.conta;
 
 import br.com.bank.domain.cliente.Cliente;
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "conta")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "numero")
 public class Conta {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, unique = true)
     private Integer numero;
-    
+
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal saldo = BigDecimal.ZERO;
-    
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente titular;
-    
-    @Column(name = "esta_ativa", nullable = false)
-    private Boolean estaAtiva = true;
 
-    public Conta(Integer numero, BigDecimal saldo, Cliente titular, Boolean estaAtiva) {
+    @Column(name = "esta_ativa", nullable = false)
+    private boolean estaAtiva = true;
+
+    public Conta() {
+    }
+
+    public Conta(Integer numero, BigDecimal saldo, Cliente titular, boolean estaAtiva) {
         this.numero = numero;
-        this.saldo = saldo;
+        this.saldo = saldo == null ? BigDecimal.ZERO : saldo;
         this.titular = titular;
         this.estaAtiva = estaAtiva;
     }
 
+    public Integer getNumero() {
+        return numero;
+    }
+
+    public void setNumero(Integer numero) {
+        this.numero = numero;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo == null ? BigDecimal.ZERO : saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo == null ? BigDecimal.ZERO : saldo;
+    }
+
+    public Cliente getTitular() {
+        return titular;
+    }
+
+    public void setTitular(Cliente titular) {
+        this.titular = titular;
+    }
+
+    public boolean getEstaAtiva() {
+        return estaAtiva;
+    }
+
+    public void setEstaAtiva(boolean estaAtiva) {
+        this.estaAtiva = estaAtiva;
+    }
+
     public boolean possuiSaldo(){
-        return this.saldo.compareTo(BigDecimal.ZERO) > 0;
+        return getSaldo().compareTo(BigDecimal.ZERO) > 0;
     }
 
     @Override
@@ -52,5 +78,17 @@ public class Conta {
                 ", estaAtiva=" + estaAtiva +
                 '}';
     }
-}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Conta)) return false;
+        Conta conta = (Conta) o;
+        return Objects.equals(numero, conta.numero);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numero);
+    }
+}
