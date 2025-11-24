@@ -1,41 +1,34 @@
 package br.com.bank.domain.cliente;
 
-import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@Table(name = "cliente")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "cpf")
 public class Cliente {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
     private String nome;
+    
+    @Column(nullable = false, unique = true, length = 11)
     private String cpf;
+    
+    @Column(nullable = false)
     private String email;
 
     public Cliente(DadosCadastroCliente dados){
         this.nome = dados.nome();
         this.cpf = dados.cpf();
         this.email = dados.email();
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Cliente cliente = (Cliente) o;
-        return Objects.equals(cpf, cliente.cpf);
-    }
-
-    @Override
-    public int hashCode(){
-        return Objects.hash(cpf);
-    }
-
-    public String getNome(){
-        return nome;
-    }
-
-    public String getCpf(){
-        return cpf;
-    }
-
-    public String getEmail(){
-        return email;
     }
 
     @Override
