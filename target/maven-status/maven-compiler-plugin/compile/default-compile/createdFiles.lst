@@ -1,0 +1,5 @@
+br\com\bank\controller\HistoricoTransacaoController.class
+br\com\bank\domain\transacao\HistoricoTransacaoRepository.class
+br\com\bank\controller\ContaController.class
+br\com\bank\domain\transacao\HistoricoTransacao.class
+br\com\bank\controller\GlobalExceptionHandler.class

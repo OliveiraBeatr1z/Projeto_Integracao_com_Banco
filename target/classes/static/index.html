@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytebank Web Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- script moved to end of body to ensure DOM is loaded -->
+</head>
+<body>
+
+<header>
+    <h1><i class="fas fa-university"></i> Bytebank Web</h1>
+    <div id="messages" style="display:none; padding:10px; margin:10px 0; border-radius:4px;"></div>
+</header>
+
+<main>
+    <nav id="sidebar">
+        <a href="#home" class="nav-link active" data-target="home-section"><i class="fas fa-home"></i> Home</a>
+        <a href="#contas" class="nav-link" data-target="contas-section"><i class="fas fa-credit-card"></i> Contas</a>
+        <a href="#operacoes" class="nav-link" data-target="operacoes-section"><i class="fas fa-exchange-alt"></i> Operações</a>
+        <a href="#historico" class="nav-link" data-target="historico-section"><i class="fas fa-history"></i> Histórico</a>
+        <a href="#relatorios" class="nav-link" data-target="relatorios-section"><i class="fas fa-chart-line"></i> Relatórios</a>
+    </nav>
+
+    <div id="content">
+
+        <section id="home-section" class="content-section active">
+            <h2>Acesso Rápido</h2>
+            <div class="card-container">
+                <div class="card" data-target="contas-section">
+                    <i class="fas fa-plus-circle"></i> Criar Conta
+                </div>
+                <div class="card" data-target="operacoes-section">
+                    <i class="fas fa-money-bill-wave"></i> Transações
+                </div>
+                <div class="card" data-target="historico-section">
+                    <i class="fas fa-search"></i> Consultar Extrato
+                </div>
+                <div class="card" data-target="relatorios-section">
+                    <i class="fas fa-chart-pie"></i> Estatísticas
+                </div>
+            </div>
+        </section>
+
+        <section id="contas-section" class="content-section">
+            <h2><i class="fas fa-credit-card"></i> Gestão de Contas</h2>
+            <div class="form-container">
+                <h3>Nova Conta</h3>
+                <form id="formNovaConta">
+                    <input type="number" id="c_numero" placeholder="Número da Conta (ex: 1001)" required>
+                    <input type="text" id="c_nome" placeholder="Nome do Cliente" required>
+                    <input type="text" id="c_cpf" placeholder="CPF (11 dígitos)" required>
+                    <input type="email" id="c_email" placeholder="E-mail" required>
+                    <button type="submit"><i class="fas fa-save"></i> Criar Conta</button>
+                </form>
+            </div>
+
+            <h3>Lista de Contas Ativas</h3>
+            <button onclick="listarContas()"><i class="fas fa-sync"></i> Atualizar Lista</button>
+            <table id="tabelaContas">
+                <thead>
+                <tr><th>Número</th><th>Nome</th><th>CPF</th><th>Saldo</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="operacoes-section" class="content-section">
+            <h2><i class="fas fa-exchange-alt"></i> Operações Bancárias</h2>
+
+            <div class="operacao-card">
+                <h3>Consultar Saldo</h3>
+                <form id="formConsultarSaldo">
+                    <input type="number" id="s_consulta_numero" placeholder="Número da Conta" required>
+                    <button type="submit"><i class="fas fa-search-dollar"></i> Consultar</button>
+                </form>
+                <p id="resultadoSaldo" class="resultado"></p>
+            </div>
+
+            <div class="operacao-card">
+                <h3>Depósito</h3>
+                <form id="formDeposito">
+                    <input type="number" id="d_numero" placeholder="Número da Conta" required>
+                    <input type="number" id="d_valor" placeholder="Valor" required min="0.01">
+                    <button type="submit" class="deposit-btn"><i class="fas fa-plus"></i> Depositar</button>
+                </form>
+            </div>
+
+            <div class="operacao-card">
+                <h3>Saque</h3>
+                <form id="formSaque">
+                    <input type="number" id="s_numero" placeholder="Número da Conta" required>
+                    <input type="number" id="s_valor" placeholder="Valor" required min="0.01">
+                    <button type="submit" class="saque-btn"><i class="fas fa-minus"></i> Sacar</button>
+                </form>
+            </div>
+
+            <div class="operacao-card full-width">
+                <h3>Transferência</h3>
+                <form id="formTransferencia">
+                    <input type="number" id="t_origem" placeholder="Conta de Origem" required>
+                    <input type="number" id="t_destino" placeholder="Conta de Destino" required>
+                    <input type="number" id="t_valor" placeholder="Valor" required min="0.01">
+                    <button type="submit" class="transfer-btn"><i class="fas fa-arrow-right"></i> Transferir</button>
+                </form>
+            </div>
+
+        </section>
+
+        <section id="historico-section" class="content-section">
+            <h2><i class="fas fa-history"></i> Histórico de Transações</h2>
+            <div class="form-container">
+                <form id="formConsultarExtrato">
+                    <input type="number" id="h_numero" placeholder="Número da Conta" required>
+                    <div class="date-group">
+                        <label for="h_data_inicio">Início:</label>
+                        <input type="date" id="h_data_inicio" value="2024-11-01">
+                        <label for="h_data_fim">Fim:</label>
+                        <input type="date" id="h_data_fim" value="2024-11-30">
+                    </div>
+                    <button type="submit"><i class="fas fa-calendar-alt"></i> Consultar Extrato</button>
+                </form>
+            </div>
+
+            <div class="result-area">
+                <h4 id="extratoTitulo">Extrato da Conta [Nº]</h4>
+                <table id="tabelaExtrato">
+                    <thead>
+                    <tr><th>Data/Hora</th><th>Tipo</th><th>Valor</th><th>Saldo Anterior</th><th>Novo Saldo</th></tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="relatorios-section" class="content-section">
+            <h2><i class="fas fa-chart-line"></i> Relatórios Gerenciais</h2>
+
+            <div class="relatorio-card">
+                <h3><i class="fas fa-balance-scale"></i> Saldo Total do Banco</h3>
+                <button onclick="consultarRelatorioGeral()">Gerar Relatório</button>
+                <div id="relatorioGeral" class="resultado-stats">
+                </div>
+            </div>
+
+            <div class="relatorio-card">
+                <h3><i class="fas fa-bell"></i> Contas com Saldo Baixo</h3>
+                <form id="formContasBaixoSaldo">
+                    <input type="number" id="r_limite_saldo" placeholder="Limite (Ex: 1000)" required min="0">
+                    <button type="submit">Consultar</button>
+                </form>
+                <table id="tabelaBaixoSaldo" class="small-table"></table>
+            </div>
+
+            <div class="relatorio-card">
+                <h3><i class="fas fa-exchange-alt"></i> Movimentações por Tipo</h3>
+                <form id="formRelatorioMovimentacoes">
+                    <div class="date-group">
+                        <label for="r_data_inicio">Início:</label>
+                        <input type="date" id="r_data_inicio" value="2024-11-01">
+                        <label for="r_data_fim">Fim:</label>
+                        <input type="date" id="r_data_fim" value="2024-11-30">
+                    </div>
+                    <button type="submit">Gerar Relatório</button>
+                </form>
+                <div id="relatorioMovimentacoes" class="resultado-stats">
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+<script src="js/script.js"></script>
+</body>
+</html>
