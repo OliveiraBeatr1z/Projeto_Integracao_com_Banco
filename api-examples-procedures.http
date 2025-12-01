@@ -1,0 +1,244 @@
+### ByteBank API - Exemplos de Procedures e Triggers
+
+# ==========================================
+# PRIMEIRO: Execute o schema.sql no MySQL
+# mysql -u root -p bytebank < src/main/resources/schema.sql
+# ==========================================
+
+### 1. Criar conta (Trigger registra ABERTURA automaticamente)
+POST http://localhost:8080/api/contas
+Content-Type: application/json
+
+{
+  "numero": 2001,
+  "dadosCliente": {
+    "nome": "Pedro Santos",
+    "cpf": "11122233344",
+    "email": "pedro@email.com"
+  }
+}
+
+###
+
+### 2. Criar segunda conta para testes
+POST http://localhost:8080/api/contas
+Content-Type: application/json
+
+{
+  "numero": 2002,
+  "dadosCliente": {
+    "nome": "Ana Silva",
+    "cpf": "55566677788",
+    "email": "ana@email.com"
+  }
+}
+
+###
+
+### 3. Fazer depósito (Trigger registra DEPOSITO automaticamente)
+POST http://localhost:8080/api/contas/2001/deposito
+Content-Type: application/json
+
+{
+  "valor": 5000.00
+}
+
+###
+
+### 4. Fazer outro depósito
+POST http://localhost:8080/api/contas/2002/deposito
+Content-Type: application/json
+
+{
+  "valor": 3000.00
+}
+
+###
+
+### 5. Fazer saque (Trigger registra SAQUE automaticamente)
+POST http://localhost:8080/api/contas/2001/saque
+Content-Type: application/json
+
+{
+  "valor": 500.00
+}
+
+###
+
+### 6. Fazer transferência (Trigger registra ambas operações)
+POST http://localhost:8080/api/contas/transferencia
+Content-Type: application/json
+
+{
+  "numeroOrigem": 2001,
+  "numeroDestino": 2002,
+  "valor": 1000.00
+}
+
+###
+
+# ==========================================
+# CONSULTAR HISTÓRICO (via Repository JPA)
+# ==========================================
+
+### 7. Ver histórico completo da conta 2001
+GET http://localhost:8080/api/historico/conta/2001
+
+###
+
+### 8. Ver histórico da conta 2002
+GET http://localhost:8080/api/historico/conta/2002
+
+###
+
+### 9. Ver histórico por período (últimos 30 dias)
+GET http://localhost:8080/api/historico/conta/2001/periodo?dataInicio=2024-11-01&dataFim=2024-11-30
+
+###
+
+### 10. Ver apenas depósitos
+GET http://localhost:8080/api/historico/tipo/DEPOSITO
+
+###
+
+### 11. Ver apenas saques
+GET http://localhost:8080/api/historico/tipo/SAQUE
+
+###
+
+### 12. Ver transferências enviadas
+GET http://localhost:8080/api/historico/tipo/TRANSFERENCIA_ENVIADA
+
+###
+
+# ==========================================
+# USAR PROCEDURES (via Stored Procedure)
+# ==========================================
+
+### 13. Consultar extrato via PROCEDURE sp_extrato_conta
+GET http://localhost:8080/api/historico/extrato/2001
+
+###
+
+### 14. Extrato com período específico
+GET http://localhost:8080/api/historico/extrato/2001?dataInicio=2024-11-01&dataFim=2024-11-30
+
+###
+
+### 15. Consultar saldo total do banco via PROCEDURE sp_saldo_total_banco
+GET http://localhost:8080/api/historico/relatorio/saldo-total
+
+###
+
+### 16. Listar contas com saldo baixo (< R$ 100) via PROCEDURE sp_contas_saldo_baixo
+GET http://localhost:8080/api/historico/relatorio/contas-saldo-baixo
+
+###
+
+### 17. Listar contas com saldo abaixo de R$ 2000
+GET http://localhost:8080/api/historico/relatorio/contas-saldo-baixo?limiteSaldo=2000.00
+
+###
+
+### 18. Relatório de movimentações por período via PROCEDURE sp_relatorio_movimentacoes
+GET http://localhost:8080/api/historico/relatorio/movimentacoes?dataInicio=2024-11-01&dataFim=2024-12-31
+
+###
+
+### 19. ⚠️ CUIDADO: Aplicar taxa de manutenção via PROCEDURE sp_aplicar_taxa_manutencao
+# Esta operação MODIFICA os saldos das contas!
+POST http://localhost:8080/api/historico/admin/aplicar-taxa
+Content-Type: application/json
+
+{
+  "valorTaxa": 5.00
+}
+
+###
+
+# ==========================================
+# TESTANDO O FLUXO COMPLETO
+# ==========================================
+
+### 20. Criar nova conta de teste
+POST http://localhost:8080/api/contas
+Content-Type: application/json
+
+{
+  "numero": 2003,
+  "dadosCliente": {
+    "nome": "Carlos Oliveira",
+    "cpf": "99988877766",
+    "email": "carlos@email.com"
+  }
+}
+
+###
+
+### 21. Depositar R$ 10.000
+POST http://localhost:8080/api/contas/2003/deposito
+Content-Type: application/json
+
+{
+  "valor": 10000.00
+}
+
+###
+
+### 22. Sacar R$ 2.500
+POST http://localhost:8080/api/contas/2003/saque
+Content-Type: application/json
+
+{
+  "valor": 2500.00
+}
+
+###
+
+### 23. Transferir R$ 3.000 para conta 2001
+POST http://localhost:8080/api/contas/transferencia
+Content-Type: application/json
+
+{
+  "numeroOrigem": 2003,
+  "numeroDestino": 2001,
+  "valor": 3000.00
+}
+
+###
+
+### 24. Ver extrato completo da conta 2003
+GET http://localhost:8080/api/historico/extrato/2003
+
+###
+
+### 25. Consultar saldo atual
+GET http://localhost:8080/api/contas/2003/saldo
+
+###
+
+# ==========================================
+# COMANDOS cURL EQUIVALENTES
+# ==========================================
+
+# Criar conta
+# curl -X POST http://localhost:8080/api/contas -H "Content-Type: application/json" -d '{"numero": 2001, "dadosCliente": {"nome": "Pedro Santos", "cpf": "11122233344", "email": "pedro@email.com"}}'
+
+# Ver histórico
+# curl http://localhost:8080/api/historico/conta/2001
+
+# Extrato via procedure
+# curl http://localhost:8080/api/historico/extrato/2001
+
+# Saldo total do banco
+# curl http://localhost:8080/api/historico/relatorio/saldo-total
+
+# Contas com saldo baixo
+# curl "http://localhost:8080/api/historico/relatorio/contas-saldo-baixo?limiteSaldo=1000.00"
+
+# Relatório de movimentações
+# curl "http://localhost:8080/api/historico/relatorio/movimentacoes?dataInicio=2024-11-01&dataFim=2024-11-30"
+
+# Aplicar taxa (CUIDADO!)
+# curl -X POST http://localhost:8080/api/historico/admin/aplicar-taxa -H "Content-Type: application/json" -d '{"valorTaxa": 5.00}'
+

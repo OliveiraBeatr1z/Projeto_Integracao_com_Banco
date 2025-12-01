@@ -7,7 +7,6 @@ import lombok.*;
 @Table(name = "cliente")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "cpf")
 public class Cliente {
@@ -31,9 +30,30 @@ public class Cliente {
         this.email = dados.email();
     }
 
+    public Cliente() {
+        // Construtor padrão exigido pelo JPA
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+    public String getCpf() {
+        return cpf;
+    }
+    public String getEmail() {
+        return email;
+    }
+
     @Override
     public String toString(){
         return "Cliente{nome='" + nome + "', cpf='" + cpf + "', email='" + email + "'}";
     }
 }
-

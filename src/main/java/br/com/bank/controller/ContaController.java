@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/contas")
 public class ContaController {
@@ -171,6 +170,16 @@ public class ContaController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Formato de data inválido. Use o formato yyyy-MM-dd.");
+        }
+    }
+
+    @PutMapping("/{numero}/desativar")
+    public ResponseEntity<?> desativarConta(@PathVariable Integer numero) {
+        boolean desativada = service.desativarContaViaProcedure(numero);
+        if (desativada) {
+            return ResponseEntity.ok("Conta desativada com sucesso!");
+        } else {
+            return ResponseEntity.badRequest().body("Erro ao desativar conta.");
         }
     }
 }

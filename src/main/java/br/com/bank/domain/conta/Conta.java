@@ -8,6 +8,14 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "conta")
+@NamedStoredProcedureQuery(
+    name = "Conta.desativarConta",
+    procedureName = "desativar_conta",
+    parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_numero", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.OUT, name = "p_status", type = Boolean.class)
+    }
+)
 public class Conta {
 
     @Id

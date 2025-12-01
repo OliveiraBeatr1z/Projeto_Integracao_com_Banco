@@ -1,0 +1,121 @@
+### ByteBank API - Exemplos de Requisições REST
+
+# Você pode usar este arquivo com a extensão REST Client do VS Code
+# Ou copiar os comandos cURL para o terminal
+
+### 1. Listar todas as contas abertas
+GET http://localhost:8080/api/contas
+
+###
+
+### 2. Abrir nova conta
+POST http://localhost:8080/api/contas
+Content-Type: application/json
+
+{
+  "numero": 1001,
+  "dadosCliente": {
+    "nome": "Maria Silva",
+    "cpf": "12345678901",
+    "email": "maria.silva@email.com"
+  }
+}
+
+###
+
+### 3. Abrir segunda conta para testes de transferência
+POST http://localhost:8080/api/contas
+Content-Type: application/json
+
+{
+  "numero": 1002,
+  "dadosCliente": {
+    "nome": "João Santos",
+    "cpf": "98765432100",
+    "email": "joao.santos@email.com"
+  }
+}
+
+###
+
+### 4. Buscar conta específica
+GET http://localhost:8080/api/contas/1001
+
+###
+
+### 5. Consultar saldo da conta
+GET http://localhost:8080/api/contas/1001/saldo
+
+###
+
+### 6. Realizar depósito
+POST http://localhost:8080/api/contas/1001/deposito
+Content-Type: application/json
+
+{
+  "valor": 1000.00
+}
+
+###
+
+### 7. Realizar saque
+POST http://localhost:8080/api/contas/1001/saque
+Content-Type: application/json
+
+{
+  "valor": 250.50
+}
+
+###
+
+### 8. Realizar transferência entre contas
+# Certifique-se de que a conta 1001 tem saldo suficiente
+POST http://localhost:8080/api/contas/transferencia
+Content-Type: application/json
+
+{
+  "numeroOrigem": 1001,
+  "numeroDestino": 1002,
+  "valor": 100.00
+}
+
+###
+
+### 9. Encerrar conta (apenas se saldo for zero)
+DELETE http://localhost:8080/api/contas/1001
+
+###
+
+# ==========================================
+# Comandos cURL equivalentes
+# ==========================================
+
+# 1. Listar contas
+# curl http://localhost:8080/api/contas
+
+# 2. Abrir conta
+# curl -X POST http://localhost:8080/api/contas \
+#   -H "Content-Type: application/json" \
+#   -d '{"numero": 1001, "dadosCliente": {"nome": "Maria Silva", "cpf": "12345678901", "email": "maria.silva@email.com"}}'
+
+# 3. Consultar saldo
+# curl http://localhost:8080/api/contas/1001/saldo
+
+# 4. Fazer depósito
+# curl -X POST http://localhost:8080/api/contas/1001/deposito \
+#   -H "Content-Type: application/json" \
+#   -d '{"valor": 1000.00}'
+
+# 5. Fazer saque
+# curl -X POST http://localhost:8080/api/contas/1001/saque \
+#   -H "Content-Type: application/json" \
+#   -d '{"valor": 250.50}'
+
+# 6. Fazer transferência
+# curl -X POST http://localhost:8080/api/contas/transferencia \
+#   -H "Content-Type: application/json" \
+#   -d '{"numeroOrigem": 1001, "numeroDestino": 1002, "valor": 100.00}'
+
+# 7. Encerrar conta
+# curl -X DELETE http://localhost:8080/api/contas/1001
+

@@ -123,6 +123,24 @@ document.getElementById('formNovaConta').addEventListener('submit', async functi
     }
 });
 
+document.getElementById('btnDesativarConta').addEventListener('click', async function() {
+    const numero = parseInt(document.getElementById('c_numero').value);
+    if (!numero) {
+        showMessage('Informe o número da conta para desativar.', 'error');
+        return;
+    }
+    if (!confirm(`Deseja realmente desativar a conta ${numero}?`)) return;
+    try {
+        await fetchJson(`${API_BASE_URL}/contas/${numero}/desativar`, {
+            method: 'PUT'
+        });
+        showMessage(`Conta ${numero} desativada com sucesso!`);
+        listarContas();
+    } catch (error) {
+        // O erro já é mostrado pela função fetchJson
+    }
+});
+
 // ====================================================
 // SEÇÃO OPERAÇÕES
 // ====================================================

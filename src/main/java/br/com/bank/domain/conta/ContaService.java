@@ -5,6 +5,10 @@ import br.com.bank.domain.cliente.Cliente;
 import br.com.bank.domain.cliente.ClienteRepository;
 import br.com.bank.domain.transacao.HistoricoTransacao;
 import br.com.bank.domain.transacao.HistoricoTransacaoRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.StoredProcedureQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +33,9 @@ public class ContaService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public Set<Conta> listarContasAbertas() {
         return new HashSet<>(contaRepository.findByEstaAtivaTrue());
     }
@@ -47,11 +54,13 @@ public class ContaService {
         String cpf = dadosDaConta.dadosCliente().cpf();
         Cliente cliente = clienteRepository.findByCpf(cpf)
                 .orElseGet(() -> new Cliente(dadosDaConta.dadosCliente()));
+            // Atualiza nome e email se o cliente já existir
+        cliente.setNome(dadosDaConta.dadosCliente().nome());
+        cliente.setEmail(dadosDaConta.dadosCliente().email());
+        clienteRepository.save(cliente);
 
         var conta = new Conta(dadosDaConta.numero(), BigDecimal.ZERO, cliente, true);
-
         contaRepository.save(conta);
-
         registrarHistorico(conta.getNumero(), "ABERTURA", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "Abertura da conta e saldo inicial.");
     }
 
@@ -166,6 +175,15 @@ public class ContaService {
         registrarHistorico(conta.getNumero(), "ENCERRAMENTO LÓGICO", BigDecimal.ZERO, saldoAtual, saldoAtual, "Conta desativada (saldo zero).");
     }
 
+    @Transactional
+    public boolean desativarContaViaProcedure(Integer numero) {
+        StoredProcedureQuery query = entityManager.createNamedStoredProcedureQuery("Conta.desativarConta");
+        query.setParameter("p_numero", numero);
+        query.execute();
+        Boolean status = (Boolean) query.getOutputParameterValue("p_status");
+        return status != null && !status;
+    }
+
     private void registrarHistorico(Integer numeroConta, String tipo, BigDecimal valor, BigDecimal saldoAnterior, BigDecimal saldoNovo, String descricao) {
         HistoricoTransacao historico = new HistoricoTransacao(
                 numeroConta,
@@ -221,7 +239,7 @@ public class ContaService {
         }
 
         LocalDateTime fimDoDia = dataFim.withHour(23).withMinute(59).withSecond(59);
-        
+
         List<HistoricoTransacao> todasTransacoes = historicoRepository.findAll();
 
         return todasTransacoes.stream()
